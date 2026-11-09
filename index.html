@@ -42,11 +42,11 @@ header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:var(--s2);padding-block:.8rem}
 .brand{display:flex;align-items:center;gap:.6rem;text-decoration:none;font-family:var(--f-display);font-weight:700}
 .brand i{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 14px var(--accent)}
-.nav ul{display:flex;gap:var(--s3);list-style:none;margin:0;padding:0}
+.nav .links{display:flex;gap:var(--s3);list-style:none;margin:0;padding:0}
 .nav ul a{text-decoration:none;color:var(--muted);font-size:.92rem}
 .nav ul a:hover,.nav ul a.on{color:var(--ink)}
 .nav .btn{padding:.55rem .95rem}
-@media (max-width:760px){.nav ul{display:none}}
+@media (max-width:760px){.nav .links{display:none}}
 
 /* Hero */
 .hero{padding-block:var(--s5) 0;display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:var(--s4);align-items:center}
@@ -56,7 +56,8 @@ header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .hero .cta{display:flex;flex-wrap:wrap;gap:.75rem;margin-top:var(--s3)}
 .proof{display:flex;flex-wrap:wrap;gap:.4rem var(--s3);margin-top:var(--s4);padding-top:var(--s2);border-top:1px solid var(--line);color:var(--muted)}
 .proof b{color:var(--ink);font-weight:600}
-.phone{justify-self:center;width:min(100%,20rem);border:1px solid var(--line);border-radius:30px;padding:var(--s2);background:linear-gradient(180deg,var(--raise),var(--bg));box-shadow:0 30px 80px -30px #000}
+.phone-stage{justify-self:center;width:min(100%,20rem);perspective:1100px}
+.phone{width:100%;transform-style:preserve-3d;will-change:transform;border:1px solid var(--line);border-radius:30px;padding:var(--s2);background:linear-gradient(180deg,var(--raise),var(--bg));box-shadow:0 30px 80px -30px #000}
 .phone-top{display:flex;justify-content:space-between;color:var(--muted);padding:.2rem .4rem var(--s2)}
 .phone-time{font-family:var(--f-display);font-weight:700;font-size:3rem;text-align:center;letter-spacing:-.03em;line-height:1}
 .phone-date{text-align:center;color:var(--muted);margin-bottom:var(--s3);font-size:.85rem}
@@ -112,7 +113,10 @@ a.browser:hover{transform:translateY(-3px);border-color:var(--muted)}
 /* Night timeline */
 .night{border:1px solid var(--line);border-radius:18px;padding:var(--s4) var(--s3);background:radial-gradient(600px 300px at 90% 0%,color-mix(in srgb,var(--accent) 10%,transparent),transparent 70%),var(--raise)}
 .night-top{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:var(--s2);margin-bottom:var(--s3)}
-.night-ctl{display:grid;gap:.6rem;justify-items:end}
+.night-top .sec-head{flex:1 1 20rem;min-width:0}
+.night-ctl{display:grid;gap:.6rem;justify-items:end;flex:none}
+.clock{white-space:nowrap;min-width:6.4em;text-align:right}
+@media (max-width:560px){.clock{text-align:left;min-width:0}}
 @media (max-width:560px){.night-ctl{justify-items:start}}
 .clock{font-family:var(--f-display);font-weight:800;font-size:clamp(2.6rem,7vw,4.4rem);letter-spacing:-.04em;line-height:1;font-variant-numeric:tabular-nums}
 .steps{list-style:none;margin:0;padding:0;display:grid}
@@ -131,7 +135,8 @@ a.browser:hover{transform:translateY(-3px);border-color:var(--muted)}
 @media (max-width:820px){.grid3{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:500px){.grid3{grid-template-columns:1fr}}
 .feat{background:var(--bg);padding:var(--s3);display:grid;gap:.35rem;align-content:start;transition:background .2s}
-.feat:hover{background:var(--raise)}
+.feat{background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),color-mix(in srgb,var(--accent) 11%,transparent),transparent 70%),var(--bg)}
+.feat:hover{background:radial-gradient(260px circle at var(--mx,-999px) var(--my,-999px),color-mix(in srgb,var(--accent) 11%,transparent),transparent 70%),var(--raise)}
 .feat h3{font-size:1.1rem;font-weight:700}
 .feat p{margin:0;color:var(--muted);font-size:.94rem}
 .feat .where{font:500 .72rem var(--f-mono);color:var(--accent)}
@@ -278,26 +283,114 @@ textarea{min-height:6.5rem;resize:vertical}
 .hire{margin-top:var(--s3);padding:var(--s2) var(--s3);border:1px solid var(--line);border-radius:12px;display:flex;flex-wrap:wrap;gap:var(--s2);align-items:center;justify-content:space-between}
 .hire p{margin:0}
 
+/* ---------- Motion layer ---------- */
+header.nav{transition:background-color .35s,border-color .35s}
+.js header.nav:not(.scrolled):not(.open){background:transparent;border-bottom-color:transparent;backdrop-filter:none;-webkit-backdrop-filter:none}
+.menu-btn{display:none;width:2.6rem;height:2.6rem;border-radius:10px;border:1px solid var(--line);background:var(--raise);color:var(--ink);cursor:pointer;place-items:center}
+.menu-btn span{display:block;width:16px;height:2px;background:currentColor;border-radius:2px;position:relative;transition:background .2s}
+.menu-btn span::before,.menu-btn span::after{content:"";position:absolute;left:0;width:16px;height:2px;background:currentColor;border-radius:2px;transition:transform .25s}
+.menu-btn span::before{top:-5px}.menu-btn span::after{top:5px}
+.menu-btn[aria-expanded="true"] span{background:transparent}
+.menu-btn[aria-expanded="true"] span::before{transform:translateY(5px) rotate(45deg)}
+.menu-btn[aria-expanded="true"] span::after{transform:translateY(-5px) rotate(-45deg)}
+.nav-right{display:flex;align-items:center;gap:.5rem}
+@media (max-width:760px){.menu-btn{display:inline-grid}}
+.mnav{border-top:1px solid var(--line)}
+.nav .mnav .wrap{display:block;padding-block:0}
+.mnav ul{list-style:none;margin:0;padding:.5rem 0 1rem;display:grid}
+.nav .mnav a{display:block;padding:.8rem 0;font-size:1.05rem;color:var(--ink);border-bottom:1px solid var(--line)}
+.nav .btn.primary{animation:ring 3.4s ease-out 2s infinite}
+@keyframes ring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 50%,transparent)}70%,100%{box-shadow:0 0 0 12px transparent}}
+
+.js .hero > div:first-child > *{animation:rise .8s cubic-bezier(.2,.8,.2,1) both}
+.js .hero > div:first-child > :nth-child(2){animation-delay:.08s}
+.js .hero > div:first-child > :nth-child(3){animation-delay:.16s}
+.js .hero > div:first-child > :nth-child(4){animation-delay:.24s}
+.js .hero > div:first-child > :nth-child(5){animation-delay:.32s}
+.js .phone-stage{animation:rise 1s cubic-bezier(.2,.8,.2,1) .2s both}
+@keyframes rise{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+.notes.live{position:relative;height:13.6rem;display:block}
+.notes.live .note{position:absolute;left:0;right:0;top:0;animation:none;transition:transform .7s cubic-bezier(.2,.8,.2,1),opacity .7s}
+.note.s0{transform:none;opacity:1;z-index:4;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
+.note.s1{transform:translateY(4.7rem) scale(.97);opacity:.75;z-index:3}
+.note.s2{transform:translateY(9.4rem) scale(.94);opacity:.45;z-index:2}
+.note.s3{transform:translateY(11rem) scale(.9);opacity:0;z-index:1}
+.note.pre{transform:translateY(-1.4rem) scale(1.03);opacity:0;transition:none!important}
+
+.reveal{transition:opacity .75s ease,transform .75s cubic-bezier(.2,.8,.2,1)}
+.reveal.pre{opacity:0;transform:translateY(22px)}
+
+.tabs{position:relative}
+.ind{position:absolute;left:0;top:0;width:0;height:0;border-radius:999px;background:var(--ink);transition:transform .45s cubic-bezier(.2,.8,.2,1),width .45s cubic-bezier(.2,.8,.2,1),height .45s;pointer-events:none}
+.tabs button{position:relative;z-index:1;transition:color .3s}
+.tabs.has-ind button[aria-selected="true"]{background:transparent;border-color:transparent;color:var(--bg)}
+.stack{position:relative;aspect-ratio:16/10;max-width:100%;overflow:hidden;background:var(--bg)}
+.layer{position:absolute;inset:0;opacity:0;transform:scale(1.03);transition:opacity .55s ease,transform .8s cubic-bezier(.2,.8,.2,1)}
+.layer.on{opacity:1;transform:none}
+.layer img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.layer.screen{padding:var(--s3)}
+.browser .bar span{transition:opacity .2s}
+.detail{transition:opacity .2s ease,transform .2s ease}
+.detail.out,.bar span.out{opacity:0}
+.detail.out{transform:translateY(8px)}
+
+.steps{position:relative}
+.js .steps::before,.js .steps::after{content:"";position:absolute;left:var(--rl,0);top:var(--rt,0);height:var(--rh,0);width:2px;margin-left:-1px;background:var(--line);border-radius:2px}
+.js .steps::after{background:linear-gradient(var(--ok),var(--accent));transform-origin:top;transform:scaleY(var(--f,1));transition:transform .85s cubic-bezier(.2,.8,.2,1)}
+.steps .dot{position:relative;z-index:1}
+.steps li.hit .dot{animation:dotring .9s ease-out}
+@keyframes dotring{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--ok) 60%,transparent)}100%{box-shadow:0 0 0 10px transparent}}
+.steps li.hit.last .dot{animation-name:dotring2}
+@keyframes dotring2{0%{box-shadow:0 0 0 0 color-mix(in srgb,var(--accent) 60%,transparent)}100%{box-shadow:0 0 0 14px transparent}}
+.clock.tick{animation:tick .35s ease}
+@keyframes tick{0%{transform:translateY(-6px);opacity:.3}100%{transform:none;opacity:1}}
+
+.compare td.me{transition:opacity .5s ease,transform .5s cubic-bezier(.2,.8,.2,1)}
+.compare td.me.pre{opacity:0;transform:translateX(10px)}
+
+.pack{transition:transform .25s ease,border-color .25s}
+.pack:hover{transform:translateY(-4px);border-color:var(--muted)}
+.pack.pick:hover{border-color:var(--accent)}
+.process li{transition:border-color .3s}
+.process li:hover{border-top-color:var(--accent)}
+
 footer{margin-top:var(--s6);border-top:1px solid var(--line)}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s2);padding-block:var(--s4);color:var(--muted)}
 footer a{text-decoration:none}
 footer a:hover{color:var(--ink)}
 </style>
 <style>body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style></head><body>
+<script>document.documentElement.classList.add("js")</script>
 
 <a class="skip" href="#main">Skip to content</a>
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/edrian-avatar.jpg" alt="" width="28" height="28">Edrian Sangco</a>
-    <ul>
+    <ul class="links">
       <li><a href="#work">Work</a></li>
       <li><a href="#night">How it runs</a></li>
       <li><a href="#packages">Packages</a></li>
       <li><a href="#alagamind">Case study</a></li>
       <li><a href="#about">About</a></li>
     </ul>
-    <a class="btn primary" href="#quote">Get a quote</a>
+    <div class="nav-right">
+      <a class="btn primary" href="#quote">Get a quote</a>
+      <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="mnav" aria-label="Open menu"><span></span></button>
+    </div>
   </div>
+  <nav class="mnav" id="mnav" aria-label="Sections" hidden>
+    <div class="wrap">
+      <ul>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#alagamind">Case study</a></li>
+        <li><a href="#night">How it runs</a></li>
+        <li><a href="#packages">Packages</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#quote">Get a quote</a></li>
+      </ul>
+    </div>
+  </nav>
 </header>
 
 <main id="main">
@@ -318,15 +411,19 @@ footer a:hover{color:var(--ink)}
           <span>a <b>Siargao</b> booking site</span>
         </div>
       </div>
-      <div class="phone" aria-label="Example phone notifications from a client website">
-        <div class="phone-top mono"><span>Example</span><span>11:46 PM</span></div>
-        <div class="phone-time">11:46</div>
+      <div class="phone-stage">
+      <div class="phone" id="phone" aria-label="Example phone notifications from a client website">
+        <div class="phone-top mono"><span>Example</span><span id="ptime-s">11:46 PM</span></div>
+        <div class="phone-time" id="ptime">11:46</div>
         <div class="phone-date">While the shop is closed</div>
-        <div class="notes">
-          <div class="note"><span class="mono"><span>YOUR SITE</span><span>11:45</span></span><strong>New booking: Island hopping, 2 guests</strong></div>
-          <div class="note"><span class="mono"><span>PAYMENT</span><span>11:45</span></span><strong>₱3,600 received</strong></div>
-          <div class="note"><span class="mono"><span>INQUIRY</span><span>11:46</span></span><strong>“Do you have a room for Dec 28?”</strong></div>
+        <div class="notes" id="notes">
+          <div class="note" data-t="11:46"><span class="mono"><span>INQUIRY</span><span>11:46</span></span><strong>“Do you have a room for Dec 28?”</strong></div>
+          <div class="note" data-t="11:45"><span class="mono"><span>PAYMENT</span><span>11:45</span></span><strong>₱3,600 received</strong></div>
+          <div class="note" data-t="11:45"><span class="mono"><span>YOUR SITE</span><span>11:45</span></span><strong>New booking: Island hopping, 2 guests</strong></div>
+          <div class="note" data-t="11:48" hidden><span class="mono"><span>CO-OP</span><span>11:48</span></span><strong>Loan application submitted online</strong></div>
+          <div class="note" data-t="11:51" hidden><span class="mono"><span>YOUR SITE</span><span>11:51</span></span><strong>Sohoton Cove tour booked, 4 guests</strong></div>
         </div>
+      </div>
       </div>
     </section>
 
@@ -356,8 +453,14 @@ footer a:hover{color:var(--ink)}
         <span class="eyebrow">Finished work</span>
         <h2>Sites that are live and doing their job.</h2>
       </div>
-      <div class="tabs" role="tablist" aria-label="Projects" id="tabs"></div>
-      <div class="panel" role="tabpanel" id="panel" aria-live="polite"></div>
+      <div class="tabs" role="tablist" aria-label="Projects" id="tabs"><span class="ind" id="ind" aria-hidden="true"></span></div>
+      <div class="panel" role="tabpanel" id="panel">
+        <a class="browser" id="frame" target="_blank" rel="noopener">
+          <div class="bar"><i></i><i></i><i></i><span class="mono" id="furl"></span></div>
+          <div class="stack" id="stack"></div>
+        </a>
+        <div class="detail" id="pdetail" aria-live="polite"></div>
+      </div>
     </section>
 
     <section class="sec" id="alagamind">
@@ -644,47 +747,81 @@ const screens = {
   coop:`<div class="h" style="width:45%"></div><div class="p" style="width:90%"></div><div class="p" style="width:75%"></div><div class="row"><div class="tile"></div><div class="tile"></div><div class="tile a"></div></div><span class="pill">Loan application · Under review</span>`,
   chat:`<div class="p" style="width:65%;height:1.6rem;border-radius:10px"></div><div class="p" style="width:50%;height:1.6rem;border-radius:10px;justify-self:end;background:var(--accent);opacity:.8"></div><div class="p" style="width:70%;height:1.6rem;border-radius:10px"></div><span class="pill">Cebuano · Tagalog · English</span>`
 };
-const tabs = document.getElementById("tabs"), panel = document.getElementById("panel");
-tabs.innerHTML = work.map((w,i) => `<button role="tab" type="button" id="t-${w.id}" aria-controls="panel" aria-selected="${i===0}" data-i="${i}">${w.tab}</button>`).join("");
-function showWork(i){
-  const w = work[i];
-  tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.i==i));
-  panel.setAttribute("aria-labelledby","t-"+w.id);
-  panel.innerHTML = `
-    ${w.img
-      ? `<a class="browser" href="${w.href}" target="_blank" rel="noopener" aria-label="Open ${w.title}"><div class="bar"><i></i><i></i><i></i><span class="mono">${w.url}</span></div><div class="screen shot"><img src="${w.img}" alt="Homepage of ${w.title}" width="1200" height="750" loading="lazy"></div></a>`
-      : `<div class="browser"><div class="bar"><i></i><i></i><i></i><span class="mono">${w.url}</span></div><div class="screen">${screens[w.screen]}</div></div>`}
-    <div class="detail">
-      <h3>${w.title}</h3>
+const tabs = document.getElementById("tabs"), panel = document.getElementById("panel"), ind = document.getElementById("ind");
+const frame = document.getElementById("frame"), furl = document.getElementById("furl"), stack = document.getElementById("stack"), pdetail = document.getElementById("pdetail");
+tabs.insertAdjacentHTML("beforeend", work.map((w,i) => `<button role="tab" type="button" id="t-${w.id}" aria-controls="panel" aria-selected="${i===0}" tabindex="${i===0?0:-1}" data-i="${i}">${w.tab}</button>`).join(""));
+tabs.classList.add("has-ind");
+stack.innerHTML = work.map((w,k) => w.img
+  ? `<div class="layer${k===0?" on":""}"><img src="${w.img}" alt="Homepage of ${w.title}" width="1200" height="750"></div>`
+  : `<div class="layer screen${k===0?" on":""}">${screens[w.screen]}</div>`).join("");
+const tabBtns = [...tabs.querySelectorAll("button")], layers = [...stack.children];
+let cur = -1;
+function detailHTML(w){
+  return `<h3>${w.title}</h3>
       <p class="need">${w.need}</p>
       <ul>${w.built.map(b=>`<li>${b}</li>`).join("")}</ul>
       <div class="meta">${w.tags.map(t=>`<span>${t}</span>`).join("")}</div>
-      <a class="go" href="${w.href}" target="_blank" rel="noopener">Visit ${w.url} ↗</a>${w.src ? `<a class="go" href="${w.src}" target="_blank" rel="noopener">Source code on GitHub ↗</a>` : ""}${w.more ? `<a class="go" href="${w.more}">Read the full case study ↓</a>` : ""}
-    </div>`;
+      <a class="go" href="${w.href}" target="_blank" rel="noopener">Visit ${w.url} ↗</a>${w.src ? `<a class="go" href="${w.src}" target="_blank" rel="noopener">Source code on GitHub ↗</a>` : ""}${w.more ? `<a class="go" href="${w.more}">Read the full case study ↓</a>` : ""}`;
+}
+function placeInd(){
+  const b = tabBtns[Math.max(cur,0)];
+  ind.style.width = b.offsetWidth + "px"; ind.style.height = b.offsetHeight + "px";
+  ind.style.transform = `translate(${b.offsetLeft}px,${b.offsetTop}px)`;
+}
+function showWork(i, focus){
+  if (i === cur) { if (focus) tabBtns[i].focus(); return; }
+  const first = cur === -1; cur = i; const w = work[i];
+  tabBtns.forEach((b,k) => { b.setAttribute("aria-selected", k===i); b.tabIndex = k===i ? 0 : -1; });
+  if (focus) tabBtns[i].focus();
+  panel.setAttribute("aria-labelledby","t-"+w.id);
+  layers.forEach((l,k) => l.classList.toggle("on", k===i));
+  frame.href = w.href; frame.setAttribute("aria-label", "Open " + w.title);
+  placeInd();
+  if (first || reduce) { pdetail.innerHTML = detailHTML(w); furl.textContent = w.url; return; }
+  pdetail.classList.add("out"); furl.classList.add("out");
+  setTimeout(() => { pdetail.innerHTML = detailHTML(w); furl.textContent = w.url; pdetail.classList.remove("out"); furl.classList.remove("out"); }, 200);
 }
 tabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) showWork(+b.dataset.i); });
 tabs.addEventListener("keydown", e => {
   if (!["ArrowRight","ArrowLeft"].includes(e.key)) return;
-  const cur = +tabs.querySelector('[aria-selected="true"]').dataset.i;
-  const n = (cur + (e.key==="ArrowRight"?1:-1) + work.length) % work.length;
-  showWork(n); tabs.querySelectorAll("button")[n].focus();
+  e.preventDefault();
+  showWork((cur + (e.key==="ArrowRight"?1:-1) + work.length) % work.length, true);
 });
 showWork(0);
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(placeInd);
+addEventListener("resize", placeInd);
 
-/* Night timeline */
-const steps = [...document.querySelectorAll("#steps li")], clock = document.getElementById("clock"), replay = document.getElementById("replay");
+/* Night timeline: dots light up along a filling rail */
+const stepsEl = document.getElementById("steps");
+const steps = [...stepsEl.querySelectorAll("li")], clock = document.getElementById("clock"), replay = document.getElementById("replay");
+function layoutRail(){
+  const d = steps.map(s => s.querySelector(".dot"));
+  const a = d[0], z = d[d.length-1];
+  stepsEl.style.setProperty("--rl", (a.offsetLeft + a.offsetWidth/2) + "px");
+  stepsEl.style.setProperty("--rt", (a.offsetTop + a.offsetHeight/2) + "px");
+  stepsEl.style.setProperty("--rh", (z.offsetTop - a.offsetTop) + "px");
+}
+layoutRail(); addEventListener("resize", layoutRail);
+(document.fonts ? document.fonts.ready : Promise.resolve()).then(layoutRail);
 let timers = [];
 function play(){
   timers.forEach(clearTimeout); timers = [];
+  steps.forEach(s => s.classList.remove("hit"));
+  if (reduce) { stepsEl.style.setProperty("--f", 1); return; }
   steps.forEach(s => s.classList.add("dim"));
-  const gap = reduce ? 0 : 900;
-  steps.forEach((s,i) => timers.push(setTimeout(() => { s.classList.remove("dim"); clock.textContent = s.querySelector("time").textContent; }, gap*(i+1))));
+  stepsEl.style.setProperty("--f", 0);
+  steps.forEach((s,i) => timers.push(setTimeout(() => {
+    s.classList.remove("dim"); s.classList.add("hit");
+    stepsEl.style.setProperty("--f", (i/(steps.length-1)).toFixed(3));
+    clock.textContent = s.querySelector("time").textContent;
+    clock.classList.remove("tick"); void clock.offsetWidth; clock.classList.add("tick");
+  }, 900*(i+1))));
   replay.textContent = "↻ Replay";
 }
 replay.addEventListener("click", play);
 if ("IntersectionObserver" in window && !reduce) {
   let played = false;
-  new IntersectionObserver((es,o) => es.forEach(e => { if (e.isIntersecting && !played) { played = true; play(); o.disconnect(); } }), {threshold:.4}).observe(document.getElementById("steps"));
+  new IntersectionObserver((es,o) => es.forEach(e => { if (e.isIntersecting && !played) { played = true; play(); o.disconnect(); } }), {threshold:.4}).observe(stepsEl);
 }
 
 /* Package buttons preselect the form */
@@ -757,5 +894,91 @@ mb.querySelectorAll("button").forEach(b => b.addEventListener("click", () => {
   document.getElementById("reply").textContent = m.r; drawWeek();
 }));
 drawWeek();
+
+/* ---------- Motion layer ---------- */
+const navEl = document.querySelector("header.nav");
+
+/* Top bar: transparent at the top, solid once you scroll */
+const onScrollNav = () => navEl.classList.toggle("scrolled", scrollY > 8);
+addEventListener("scroll", onScrollNav, {passive:true}); onScrollNav();
+
+/* Phone menu */
+const menuBtn = document.getElementById("menuBtn"), mnav = document.getElementById("mnav");
+function setMenu(open){ menuBtn.setAttribute("aria-expanded", open); menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu"); mnav.hidden = !open; navEl.classList.toggle("open", open); }
+menuBtn.addEventListener("click", () => setMenu(menuBtn.getAttribute("aria-expanded") !== "true"));
+mnav.addEventListener("click", e => { if (e.target.closest("a")) setMenu(false); });
+addEventListener("keydown", e => { if (e.key === "Escape" && !mnav.hidden) { setMenu(false); menuBtn.focus(); } });
+document.addEventListener("click", e => { if (!mnav.hidden && !e.target.closest("header.nav")) setMenu(false); });
+matchMedia("(min-width:761px)").addEventListener("change", e => { if (e.matches) setMenu(false); });
+
+/* Hero phone: tilts toward the pointer and leans back as you scroll away */
+const phone = document.getElementById("phone"), heroEl = document.querySelector(".hero");
+if (!reduce) {
+  let tx = 0, ty = 0, cx = 0, cy = 0;
+  if (matchMedia("(hover:hover)").matches) addEventListener("pointermove", e => { tx = e.clientX/innerWidth - .5; ty = e.clientY/innerHeight - .5; }, {passive:true});
+  (function frame(){
+    cx += (tx - cx) * .06; cy += (ty - cy) * .06;
+    const r = heroEl.getBoundingClientRect();
+    const out = Math.max(0, Math.min(1, -r.top / (r.height * .9)));
+    phone.style.transform = `rotateX(${(-cy*7 + out*16).toFixed(2)}deg) rotateY(${(cx*10).toFixed(2)}deg) translateY(${(out*-20).toFixed(1)}px) scale(${(1 - out*.06).toFixed(3)})`;
+    requestAnimationFrame(frame);
+  })();
+}
+
+/* Hero notifications: newest arrives on top, older ones sink and fade */
+const notesEl = document.getElementById("notes"), notes = [...notesEl.children];
+const ptime = document.getElementById("ptime"), ptimeS = document.getElementById("ptime-s");
+if (!reduce) {
+  notesEl.classList.add("live"); notes.forEach(n => n.hidden = false);
+  let top = 0;
+  const N = notes.length;
+  const place = () => notes.forEach((n,k) => { n.className = "note s" + Math.min((k - top + N) % N, 3); });
+  place();
+  setInterval(() => {
+    top = (top - 1 + N) % N;
+    const fresh = notes[top]; fresh.className = "note pre"; void fresh.offsetWidth;
+    place();
+    ptime.textContent = fresh.dataset.t; ptimeS.textContent = fresh.dataset.t + " PM";
+  }, 2800);
+}
+
+/* Section reveals: everything is visible at rest; only content below the fold waits for you */
+const revealSel = ".sec-head, .compare-wrap, .tabs, .panel, .case, .night, .grid3 .feat, .process li, .pack, .quote > *, .about, .cv > div, .hire";
+if ("IntersectionObserver" in window && !reduce) {
+  const rio = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target, sib = [...el.parentElement.children].filter(x => x.classList.contains("reveal"));
+    el.style.transitionDelay = Math.min(sib.indexOf(el), 5) * 80 + "ms";
+    el.classList.remove("pre"); rio.unobserve(el);
+    setTimeout(() => el.style.transitionDelay = "", 1400);
+  }), {rootMargin:"0px 0px -8% 0px"});
+  document.querySelectorAll(revealSel).forEach(el => {
+    el.classList.add("reveal");
+    if (el.getBoundingClientRect().top > innerHeight * .92) { el.classList.add("pre"); rio.observe(el); }
+  });
+
+  /* Comparison: the "Site I build" column fills in row by row */
+  const meCells = [...document.querySelectorAll(".compare td.me")];
+  const tbl = document.querySelector(".compare");
+  if (tbl.getBoundingClientRect().top > innerHeight * .8) {
+    meCells.forEach(c => c.classList.add("pre"));
+    new IntersectionObserver((es,o) => es.forEach(e => { if (e.isIntersecting) { meCells.forEach((c,i) => setTimeout(() => c.classList.remove("pre"), 500 + i*140)); o.disconnect(); } }), {threshold:.5}).observe(tbl);
+  }
+
+  /* Count up the AlagaMind numbers */
+  document.querySelectorAll(".facts4 strong").forEach(el => {
+    const m = el.textContent.match(/^(\d+)(\+?)$/); if (!m) return;
+    const end = +m[1], suf = m[2];
+    new IntersectionObserver((es,o) => es.forEach(e => { if (!e.isIntersecting) return; o.disconnect();
+      const t0 = performance.now(), dur = 1100;
+      (function step(t){ const k = Math.min(1,(t-t0)/dur), v = Math.round(end * (1 - Math.pow(1-k,3))); el.textContent = v + suf; if (k < 1) requestAnimationFrame(step); })(t0);
+    }), {threshold:.6}).observe(el);
+  });
+}
+
+/* Feature cards: a soft light follows the pointer */
+const grid3 = document.querySelector(".grid3");
+grid3.addEventListener("pointermove", e => { const c = e.target.closest(".feat"); if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px"); });
+grid3.addEventListener("pointerout", e => { const c = e.target.closest(".feat"); if (c && !c.contains(e.relatedTarget)) { c.style.removeProperty("--mx"); c.style.removeProperty("--my"); } });
 </script>
 </body></html>
