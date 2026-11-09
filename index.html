@@ -356,14 +356,14 @@ header.nav{transition:background-color .35s,border-color .35s}
 .process li:hover{border-top-color:var(--accent)}
 
 /* ---------- Background grid with light streaks ---------- */
-:root{--cell:216px;--bgh:min(1150px,135vh);--gridline:color-mix(in srgb,var(--ink) 7%,transparent);--gridhot:color-mix(in srgb,var(--accent) 55%,transparent)}
-.bg{position:absolute;top:0;left:0;right:0;height:var(--bgh);overflow:hidden;pointer-events:none;z-index:0;
-  -webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+:root{--cell:216px;--bgh:100vh;--gridline:color-mix(in srgb,var(--ink) 7%,transparent);--gridhot:color-mix(in srgb,var(--accent) 55%,transparent)}
+@supports (height:100lvh){:root{--bgh:100lvh}}
+.bg{position:fixed;top:0;left:0;right:0;height:var(--bgh);overflow:hidden;pointer-events:none;z-index:0}
 main,footer{position:relative;z-index:1}
 .bg .lines,.bg .hot{position:absolute;inset:0;
   background-image:linear-gradient(90deg,var(--gl) 1px,transparent 1px),linear-gradient(var(--gl) 1px,transparent 1px);
   background-size:var(--cell) var(--cell);background-position:calc(50% - var(--cell)/2) 0}
-.bg .lines{--gl:var(--gridline);-webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 75% 70% at 50% 30%,#000 30%,transparent 80%)}
+.bg .lines{--gl:var(--gridline);-webkit-mask-image:radial-gradient(ellipse 95% 90% at 50% 45%,#000 45%,transparent 100%);mask-image:radial-gradient(ellipse 95% 90% at 50% 45%,#000 45%,transparent 100%)}
 .bg .hot{--gl:var(--gridhot);opacity:0;transition:opacity .5s;
   -webkit-mask-image:radial-gradient(240px circle at var(--px,50%) var(--py,-500px),#000,transparent 75%);mask-image:radial-gradient(240px circle at var(--px,50%) var(--py,-500px),#000,transparent 75%)}
 .bg.lit .hot{opacity:1}
@@ -371,10 +371,10 @@ main,footer{position:relative;z-index:1}
   background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 16%,transparent),color-mix(in srgb,var(--accent) 4%,transparent) 50%,transparent 72%);animation:breathe 9s ease-in-out infinite alternate}
 .glow.two{left:78%;top:20%;width:1100px;height:700px;background:radial-gradient(closest-side,color-mix(in srgb,#2BB5A4 14%,transparent),transparent 70%);animation-duration:13s;animation-direction:alternate-reverse}
 @keyframes breathe{100%{transform:translateX(-50%) scale(1.14);opacity:.7}}
-.streak{position:absolute;top:0;width:1px;height:100%;overflow:hidden}
+.streak{position:absolute;top:0;width:1px;height:100%;overflow:hidden;-webkit-mask-image:linear-gradient(transparent,#000 8%,#000 92%,transparent);mask-image:linear-gradient(transparent,#000 8%,#000 92%,transparent)}
 .streak::after{content:"";position:absolute;left:0;top:-170px;width:1px;height:170px;background:linear-gradient(transparent,var(--accent));
   box-shadow:0 0 8px var(--accent);animation:fall var(--d,9s) linear var(--w,0s) infinite;will-change:transform}
-.streak.h{left:0;width:100%;height:1px}
+.streak.h{left:0;width:100%;height:1px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent);mask-image:linear-gradient(90deg,transparent,#000 12%,#000 88%,transparent)}
 .streak.h::after{top:0;left:-220px;width:220px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--ink) 55%,transparent));box-shadow:none;animation-name:slide}
 @keyframes fall{100%{transform:translateY(calc(var(--bgh) + 340px))}}
 @keyframes slide{100%{transform:translateX(calc(100vw + 440px))}}
@@ -1015,17 +1015,16 @@ function buildStreaks(){
   const cols = []; for (let x = W/2 - cell/2; x > -1; x -= cell) cols.unshift(x); for (let x = W/2 + cell/2; x < W; x += cell) cols.push(x);
   const durs = [7, 9.5, 11, 8.5, 10, 7.6, 9, 12, 8], waits = [-1, -5, -8, -3, -6.5, -2, -4.5, -7, -0.5];
   let html = cols.map((x,i) => `<div class="streak" style="left:${Math.round(x)}px;--d:${durs[i%durs.length]}s;--w:${waits[i%waits.length]}s"></div>`).join("");
-  html += [2,3,5].map((r,i) => `<div class="streak h" style="top:${r*cell}px;--d:${[11,14,12][i]}s;--w:${[-3,-9,-6][i]}s"></div>`).join("");
+  const H = innerHeight, rows = []; for (let r = 1; r * cell < H - 40; r++) rows.push(r);
+  html += rows.slice(0,3).map((r,i) => `<div class="streak h" style="top:${r*cell}px;--d:${[11,14,12][i]}s;--w:${[-3,-9,-6][i]}s"></div>`).join("");
   streaksEl.innerHTML = html;
 }
 buildStreaks();
 let rw; addEventListener("resize", () => { clearTimeout(rw); rw = setTimeout(buildStreaks, 150); });
 if (matchMedia("(hover:hover)").matches) {
   addEventListener("pointermove", e => {
-    const r = bg.getBoundingClientRect();
-    const y = e.clientY - r.top;
-    bg.style.setProperty("--px", e.clientX + "px"); bg.style.setProperty("--py", y + "px");
-    bg.classList.toggle("lit", y < r.height * .8);
+    bg.style.setProperty("--px", e.clientX + "px"); bg.style.setProperty("--py", e.clientY + "px");
+    bg.classList.add("lit");
   }, {passive:true});
   document.addEventListener("pointerleave", () => bg.classList.remove("lit"));
 }
