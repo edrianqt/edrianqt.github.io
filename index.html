@@ -89,6 +89,11 @@ header.nav{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background
 .bar i{width:9px;height:9px;border-radius:50%;background:var(--line);flex:none}
 .bar span{margin-left:.5rem;padding:.2rem .7rem;border-radius:6px;background:var(--bg);color:var(--muted);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .screen{aspect-ratio:16/10;max-width:100%;padding:var(--s3);display:grid;gap:.7rem;align-content:start}
+.screen.shot{padding:0;display:block;aspect-ratio:16/10;overflow:hidden;background:var(--bg)}
+.screen.shot img{display:block;width:100%;height:100%;object-fit:cover;object-position:top}
+.browser{transition:transform .25s,border-color .25s}
+a.browser{display:block;text-decoration:none;color:inherit}
+a.browser:hover{transform:translateY(-3px);border-color:var(--muted)}
 .screen .h{height:1.1rem;width:55%;border-radius:4px;background:var(--ink);opacity:.85}
 .screen .p{height:.55rem;border-radius:4px;background:var(--line)}
 .screen .row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.6rem}
@@ -615,11 +620,11 @@ const work = [
   {id:"socorro", tab:"LGU Socorro", title:"Municipality of Socorro", url:"webhiveph.com/lgu-socorro", href:"https://webhiveph.com/lgu-socorro",
    need:"The town needed an official site that every resident can use, including older residents and people with poor eyesight.",
    built:["Built on the Philippine Government Website Template, with pages for the Mayor's Office, departments, tourism and public services","High-contrast mode, text resizing, skip links and keyboard shortcuts (WCAG 2.0)","Emergency hotline directory, “Socorro in Numbers” statistics and transparency documents"],
-   tags:["WordPress","PHP","Live"], screen:"lgu"},
+   tags:["WordPress","PHP","Live"], screen:"lgu", img:"img/socorro.jpg"},
   {id:"siargao", tab:"SiargaoHotels.ph", title:"SiargaoHotels.ph", url:"siargaohotels.ph", href:"https://siargaohotels.ph",
    need:"A Siargao travel business wanted guests to book hotels, tours and vehicle rentals directly, without back-and-forth messages.",
    built:["Date search across hotels, tours and vehicle rentals","Cart, reviews and Google Sign-In","Prices switch between pesos and dollars"],
-   tags:["WordPress","Elementor","PHP","Live"], screen:"book"},
+   tags:["WordPress","Elementor","PHP","Live"], screen:"book", img:"img/siargao.jpg"},
   {id:"soemco", tab:"SOEMCO", title:"SOEMCO Cooperative", url:"github.com/edrianqt/soemco-website", href:"https://github.com/edrianqt/soemco-website",
    need:"A cooperative with 11 branches needed members to apply for membership and loans online, and staff to review them in one place.",
    built:["41 savings and loan products with a branch filter and a loan calculator","Online membership and loan applications with status tracking and a staff dashboard","Rate-limited forms, secure cookies and HTTPS, plus 21 automated tests and an English/Cebuano switch"],
@@ -642,7 +647,9 @@ function showWork(i){
   tabs.querySelectorAll("button").forEach(b => b.setAttribute("aria-selected", b.dataset.i==i));
   panel.setAttribute("aria-labelledby","t-"+w.id);
   panel.innerHTML = `
-    <div class="browser"><div class="bar"><i></i><i></i><i></i><span class="mono">${w.url}</span></div><div class="screen">${screens[w.screen]}</div></div>
+    ${w.img
+      ? `<a class="browser" href="${w.href}" target="_blank" rel="noopener" aria-label="Open ${w.title}"><div class="bar"><i></i><i></i><i></i><span class="mono">${w.url}</span></div><div class="screen shot"><img src="${w.img}" alt="Homepage of ${w.title}" width="1200" height="750" loading="lazy"></div></a>`
+      : `<div class="browser"><div class="bar"><i></i><i></i><i></i><span class="mono">${w.url}</span></div><div class="screen">${screens[w.screen]}</div></div>`}
     <div class="detail">
       <h3>${w.title}</h3>
       <p class="need">${w.need}</p>
