@@ -625,10 +625,10 @@ const work = [
    need:"A Siargao travel business wanted guests to book hotels, tours and vehicle rentals directly, without back-and-forth messages.",
    built:["Date search across hotels, tours and vehicle rentals","Cart, reviews and Google Sign-In","Prices switch between pesos and dollars"],
    tags:["WordPress","Elementor","PHP","Live"], screen:"book", img:"img/siargao.jpg"},
-  {id:"soemco", tab:"SOEMCO", title:"SOEMCO Cooperative", url:"github.com/edrianqt/soemco-website", href:"https://github.com/edrianqt/soemco-website",
+  {id:"soemco", tab:"SOEMCO", title:"SOEMCO Cooperative", url:"soemco.org.ph", href:"https://www.soemco.org.ph/", src:"https://github.com/edrianqt/soemco-website",
    need:"A cooperative with 11 branches needed members to apply for membership and loans online, and staff to review them in one place.",
    built:["41 savings and loan products with a branch filter and a loan calculator","Online membership and loan applications with status tracking and a staff dashboard","Rate-limited forms, secure cookies and HTTPS, plus 21 automated tests and an English/Cebuano switch"],
-   tags:["Django","PostgreSQL","Docker"], screen:"coop"},
+   tags:["Django","PostgreSQL","Docker","Live"], screen:"coop", img:"img/soemco.jpg"},
   {id:"alagamind", tab:"AlagaMind", title:"AlagaMind", url:"alagamind.app", href:"https://alagamind.app/",
    need:"Our University of Cebu thesis: mental wellness support in the languages people here actually speak.",
    built:["Built the conversational screens in Cebuano, Tagalog and English","Built daily mood tracking and the crisis-resource links","Ran functional and usability testing in all three languages"],
@@ -655,7 +655,7 @@ function showWork(i){
       <p class="need">${w.need}</p>
       <ul>${w.built.map(b=>`<li>${b}</li>`).join("")}</ul>
       <div class="meta">${w.tags.map(t=>`<span>${t}</span>`).join("")}</div>
-      <a class="go" href="${w.href}" target="_blank" rel="noopener">Visit ${w.url} ↗</a>${w.more ? `<a class="go" href="${w.more}">Read the full case study ↓</a>` : ""}
+      <a class="go" href="${w.href}" target="_blank" rel="noopener">Visit ${w.url} ↗</a>${w.src ? `<a class="go" href="${w.src}" target="_blank" rel="noopener">Source code on GitHub ↗</a>` : ""}${w.more ? `<a class="go" href="${w.more}">Read the full case study ↓</a>` : ""}
     </div>`;
 }
 tabs.addEventListener("click", e => { const b = e.target.closest("button"); if (b) showWork(+b.dataset.i); });
