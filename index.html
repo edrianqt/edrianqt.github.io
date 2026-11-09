@@ -315,7 +315,7 @@ header.nav{transition:background-color .35s,border-color .35s}
 .note.s0{transform:none;opacity:1;z-index:4;border-color:color-mix(in srgb,var(--accent) 45%,var(--line))}
 .note.s1{transform:translateY(4.7rem) scale(.97);opacity:.75;z-index:3}
 .note.s2{transform:translateY(9.4rem) scale(.94);opacity:.45;z-index:2}
-.note.s3{transform:translateY(11rem) scale(.9);opacity:0;z-index:1}
+.note.s3{transform:translateY(9.4rem) scale(.9);opacity:0;z-index:1}
 .note.pre{transform:translateY(-1.4rem) scale(1.03);opacity:0;transition:none!important}
 
 .reveal{transition:opacity .75s ease,transform .75s cubic-bezier(.2,.8,.2,1)}
@@ -355,6 +355,32 @@ header.nav{transition:background-color .35s,border-color .35s}
 .process li{transition:border-color .3s}
 .process li:hover{border-top-color:var(--accent)}
 
+/* ---------- Background grid with light streaks ---------- */
+:root{--cell:216px;--bgh:min(1150px,135vh);--gridline:color-mix(in srgb,var(--ink) 7%,transparent);--gridhot:color-mix(in srgb,var(--accent) 55%,transparent)}
+.bg{position:absolute;top:0;left:0;right:0;height:var(--bgh);overflow:hidden;pointer-events:none;z-index:0;
+  -webkit-mask-image:linear-gradient(#000 55%,transparent);mask-image:linear-gradient(#000 55%,transparent)}
+main,footer{position:relative;z-index:1}
+.bg .lines,.bg .hot{position:absolute;inset:0;
+  background-image:linear-gradient(90deg,var(--gl) 1px,transparent 1px),linear-gradient(var(--gl) 1px,transparent 1px);
+  background-size:var(--cell) var(--cell);background-position:calc(50% - var(--cell)/2) 0}
+.bg .lines{--gl:var(--gridline);-webkit-mask-image:radial-gradient(ellipse 75% 70% at 50% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 75% 70% at 50% 30%,#000 30%,transparent 80%)}
+.bg .hot{--gl:var(--gridhot);opacity:0;transition:opacity .5s;
+  -webkit-mask-image:radial-gradient(240px circle at var(--px,50%) var(--py,-500px),#000,transparent 75%);mask-image:radial-gradient(240px circle at var(--px,50%) var(--py,-500px),#000,transparent 75%)}
+.bg.lit .hot{opacity:1}
+.glow{position:absolute;left:50%;top:-30%;width:1000px;height:820px;transform:translateX(-50%);border-radius:50%;
+  background:radial-gradient(closest-side,color-mix(in srgb,var(--accent) 16%,transparent),color-mix(in srgb,var(--accent) 4%,transparent) 50%,transparent 72%);animation:breathe 9s ease-in-out infinite alternate}
+.glow.two{left:78%;top:20%;width:1100px;height:700px;background:radial-gradient(closest-side,color-mix(in srgb,#2BB5A4 14%,transparent),transparent 70%);animation-duration:13s;animation-direction:alternate-reverse}
+@keyframes breathe{100%{transform:translateX(-50%) scale(1.14);opacity:.7}}
+.streak{position:absolute;top:0;width:1px;height:100%;overflow:hidden}
+.streak::after{content:"";position:absolute;left:0;top:-170px;width:1px;height:170px;background:linear-gradient(transparent,var(--accent));
+  box-shadow:0 0 8px var(--accent);animation:fall var(--d,9s) linear var(--w,0s) infinite;will-change:transform}
+.streak.h{left:0;width:100%;height:1px}
+.streak.h::after{top:0;left:-220px;width:220px;height:1px;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--ink) 55%,transparent));box-shadow:none;animation-name:slide}
+@keyframes fall{100%{transform:translateY(calc(var(--bgh) + 340px))}}
+@keyframes slide{100%{transform:translateX(calc(100vw + 440px))}}
+@media (max-width:520px){.streak.h{display:none}:root{--cell:180px}}
+@media (prefers-reduced-motion:reduce){.streak{display:none}.glow{animation:none}}
+
 footer{margin-top:var(--s6);border-top:1px solid var(--line)}
 footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:var(--s2);padding-block:var(--s4);color:var(--muted)}
 footer a{text-decoration:none}
@@ -364,6 +390,7 @@ footer a:hover{color:var(--ink)}
 <script>document.documentElement.classList.add("js")</script>
 
 <a class="skip" href="#main">Skip to content</a>
+<div class="bg" id="bg" aria-hidden="true"><div class="glow"></div><div class="glow two"></div><div class="lines"></div><div class="hot"></div><div class="streaks" id="streaks"></div></div>
 <header class="nav">
   <div class="wrap">
     <a class="brand" href="#top"><img src="img/edrian-avatar.jpg" alt="" width="28" height="28">Edrian Sangco</a>
@@ -980,5 +1007,28 @@ if ("IntersectionObserver" in window && !reduce) {
 const grid3 = document.querySelector(".grid3");
 grid3.addEventListener("pointermove", e => { const c = e.target.closest(".feat"); if (!c) return; const r = c.getBoundingClientRect(); c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px"); });
 grid3.addEventListener("pointerout", e => { const c = e.target.closest(".feat"); if (c && !c.contains(e.relatedTarget)) { c.style.removeProperty("--mx"); c.style.removeProperty("--my"); } });
+
+/* Background grid: streaks fall down the columns and slide across the rows; the grid lights up around the pointer */
+const bg = document.getElementById("bg"), streaksEl = document.getElementById("streaks");
+function buildStreaks(){
+  const W = document.documentElement.clientWidth, cell = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--cell")) || 216;
+  const cols = []; for (let x = W/2 - cell/2; x > -1; x -= cell) cols.unshift(x); for (let x = W/2 + cell/2; x < W; x += cell) cols.push(x);
+  const durs = [7, 9.5, 11, 8.5, 10, 7.6, 9, 12, 8], waits = [-1, -5, -8, -3, -6.5, -2, -4.5, -7, -0.5];
+  let html = cols.map((x,i) => `<div class="streak" style="left:${Math.round(x)}px;--d:${durs[i%durs.length]}s;--w:${waits[i%waits.length]}s"></div>`).join("");
+  html += [2,3,5].map((r,i) => `<div class="streak h" style="top:${r*cell}px;--d:${[11,14,12][i]}s;--w:${[-3,-9,-6][i]}s"></div>`).join("");
+  streaksEl.innerHTML = html;
+}
+buildStreaks();
+let rw; addEventListener("resize", () => { clearTimeout(rw); rw = setTimeout(buildStreaks, 150); });
+if (matchMedia("(hover:hover)").matches) {
+  addEventListener("pointermove", e => {
+    const r = bg.getBoundingClientRect();
+    const y = e.clientY - r.top;
+    bg.style.setProperty("--px", e.clientX + "px"); bg.style.setProperty("--py", y + "px");
+    bg.classList.toggle("lit", y < r.height * .8);
+  }, {passive:true});
+  document.addEventListener("pointerleave", () => bg.classList.remove("lit"));
+}
+
 </script>
 </body></html>
