@@ -185,6 +185,10 @@ textarea{min-height:6.5rem;resize:vertical}
 .needs input{width:auto;accent-color:var(--accent)}
 .needs label:has(input:checked){border-color:var(--accent);color:var(--accent)}
 .err{color:var(--err);font-size:.88rem;margin:0}
+.sent{display:grid;gap:.2rem;padding:var(--s2);border:1px solid color-mix(in srgb,var(--ok) 55%,var(--line));border-radius:12px;background:color-mix(in srgb,var(--ok) 8%,transparent)}
+.sent strong{color:var(--ok)}
+#q-send:disabled{opacity:.7;cursor:progress}
+form{position:relative}
 .result{border:1px dashed var(--accent);border-radius:12px;padding:var(--s2);display:grid;gap:var(--s2)}
 .result pre{margin:0;white-space:pre-wrap;font:400 .85rem/1.55 var(--f-mono);color:var(--ink);overflow-wrap:anywhere}
 .result .row{display:flex;flex-wrap:wrap;gap:.5rem}
@@ -675,7 +679,7 @@ footer a:hover{color:var(--ink)}
         <div>
           <span class="eyebrow">Get a quote</span>
           <h2>Tell me what you need.</h2>
-          <p class="lead">Fill this in and it writes the email for you. I usually reply within a day, in English, Tagalog or Cebuano.</p>
+          <p class="lead">Fill this in and it comes straight to my inbox. I usually reply within a day, in English, Tagalog or Cebuano.</p>
           <div class="direct">
             <div><span class="eyebrow">Email</span><span class="v" id="email">edriansangco23@gmail.com</span></div>
             <div><span class="eyebrow">Based in</span><span>Socorro, Surigao del Norte. I work with clients in the Philippines and abroad.</span></div>
@@ -684,8 +688,10 @@ footer a:hover{color:var(--ink)}
         <form id="qform" novalidate>
           <div class="two">
             <label for="q-name">Your name<input id="q-name" name="name" autocomplete="name" required></label>
-            <label for="q-biz">Business or organization<input id="q-biz" name="biz" autocomplete="organization"></label>
+            <label for="q-from">Your email<input id="q-from" name="email" type="email" autocomplete="email" required></label>
           </div>
+          <label for="q-biz">Business or organization<input id="q-biz" name="biz" autocomplete="organization"></label>
+          <input type="text" id="q-honey" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
           <div class="lbl">What do you need?
             <div class="needs" id="needs">
               <label for="n1"><input type="checkbox" id="n1" value="A new website">New website</label>
@@ -701,14 +707,19 @@ footer a:hover{color:var(--ink)}
           </div>
           <label for="q-msg">Anything else?<textarea id="q-msg" placeholder="For example: we're a resort in General Luna with 8 rooms and want guests to book directly."></textarea></label>
           <p class="err" id="q-err" hidden>Add your name so I know who to reply to.</p>
-          <button class="btn primary" type="submit" style="justify-self:start">Write my email</button>
+          <button class="btn primary" type="submit" id="q-send" style="justify-self:start">Send request</button>
+          <div class="sent" id="q-sent" role="status" hidden>
+            <strong>Request sent.</strong>
+            <span>Thanks! I'll reply to <span id="q-sent-to"></span> within a day.</span>
+          </div>
           <div class="result" id="q-result" hidden>
+            <p class="err" style="margin:0">Your request couldn't be sent from here. Copy the message below and email it to me instead.</p>
             <pre id="q-text"></pre>
             <div class="row">
               <button class="btn primary" type="button" id="q-copy">Copy message</button>
               <a class="btn" id="q-mail" href="#quote">Open in email app</a>
             </div>
-            <span class="mono muted">Then send it to edriansangco23@gmail.com.</span>
+            <span class="mono muted">Send it to edriansangco23@gmail.com.</span>
           </div>
         </form>
       </div>
@@ -875,22 +886,48 @@ if ("IntersectionObserver" in window && !reduce) {
 /* Package buttons preselect the form */
 document.querySelectorAll("[data-pack]").forEach(a => a.addEventListener("click", () => { document.getElementById("q-pack").value = a.dataset.pack; }));
 
-/* Quote form writes the email */
-document.getElementById("qform").addEventListener("submit", e => {
+/* Quote form: sends the request to Edrian's inbox through FormSubmit; if that fails, shows a ready-to-send message instead */
+const QUOTE_ENDPOINT = "https://formsubmit.co/ajax/edriansangco23@gmail.com";
+document.getElementById("qform").addEventListener("submit", async e => {
   e.preventDefault();
   const nameEl = document.getElementById("q-name"), name = nameEl.value.trim();
+  const fromEl = document.getElementById("q-from"), from = fromEl.value.trim();
   const err = document.getElementById("q-err");
-  if (!name) { err.hidden = false; nameEl.focus(); return; }
+  if (!name) { err.textContent = "Add your name so I know who to reply to."; err.hidden = false; nameEl.focus(); return; }
+  if (!from || !fromEl.checkValidity()) { err.textContent = "Add an email address I can reply to, like name@example.com."; err.hidden = false; fromEl.focus(); return; }
   err.hidden = true;
   const biz = document.getElementById("q-biz").value.trim();
   const needs = [...document.querySelectorAll("#needs input:checked")].map(i => i.value);
   const pack = document.getElementById("q-pack").value, when = document.getElementById("q-when").value;
   const msg = document.getElementById("q-msg").value.trim();
-  const subject = `Website quote${biz ? " for " + biz : ""}`;
-  const body = `Hi Edrian,\n\nI'm ${name}${biz ? " from " + biz : ""}. I'd like a quote for a website.\n\nWhat I need: ${needs.length ? needs.join(", ") : "Not sure yet"}\nPackage: ${pack}\nTimeline: ${when}${msg ? "\n\n" + msg : ""}\n\nThanks,\n${name}`;
-  document.getElementById("q-text").textContent = `Subject: ${subject}\n\n${body}`;
-  document.getElementById("q-mail").href = `mailto:edriansangco23@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-  const r = document.getElementById("q-result"); r.hidden = false; r.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+  const subject = `Website quote${biz ? " for " + biz : ""} from ${name}`;
+  const body = `Hi Edrian,\n\nI'm ${name}${biz ? " from " + biz : ""}. I'd like a quote for a website.\n\nWhat I need: ${needs.length ? needs.join(", ") : "Not sure yet"}\nPackage: ${pack}\nTimeline: ${when}${msg ? "\n\n" + msg : ""}\n\nYou can reach me at ${from}.\n\nThanks,\n${name}`;
+  const sendBtn = document.getElementById("q-send"), sent = document.getElementById("q-sent"), r = document.getElementById("q-result");
+  sent.hidden = true; r.hidden = true;
+  sendBtn.disabled = true; sendBtn.textContent = "Sending…";
+  try {
+    const res = await fetch(QUOTE_ENDPOINT, {
+      method: "POST",
+      headers: {"Content-Type": "application/json", "Accept": "application/json"},
+      body: JSON.stringify({
+        _subject: subject, _template: "table", _honey: document.getElementById("q-honey").value,
+        name, email: from, business: biz || "—", needs: needs.length ? needs.join(", ") : "Not sure yet",
+        package: pack, timeline: when, message: msg || "—"
+      })
+    });
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok || String(data.success) === "false") throw new Error(data.message || res.status);
+    document.getElementById("q-sent-to").textContent = from;
+    sent.hidden = false; e.target.reset();
+    sendBtn.textContent = "Sent";
+    setTimeout(() => { sendBtn.textContent = "Send request"; sendBtn.disabled = false; }, 4000);
+    sent.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+  } catch (ex) {
+    document.getElementById("q-text").textContent = `Subject: ${subject}\n\n${body}`;
+    document.getElementById("q-mail").href = `mailto:edriansangco23@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    r.hidden = false; sendBtn.textContent = "Send request"; sendBtn.disabled = false;
+    r.scrollIntoView({behavior: reduce ? "auto" : "smooth", block:"nearest"});
+  }
 });
 document.getElementById("q-copy").addEventListener("click", e => {
   const pre = document.getElementById("q-text"), btn = e.currentTarget;
